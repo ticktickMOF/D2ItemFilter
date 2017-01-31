@@ -5,3 +5,5 @@
 #define CODE32(sz)		REVERSE32( ( ( const unsigned long )( (sz) ) ) )
 
 BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem);
+
+DWORD WINAPI Worker(LPVOID);

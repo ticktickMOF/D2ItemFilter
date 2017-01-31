@@ -107,6 +107,8 @@ int __stdcall DllAttach()
 		return 0;
 	}
 	
+	CreateThread(nullptr, 0, Worker, nullptr, 0, nullptr);
+
 	D2TEMPLATE_ApplyPatch(hGame, gCodePatches);
 
 	CloseHandle(hGame);
