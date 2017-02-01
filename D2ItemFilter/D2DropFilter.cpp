@@ -16,6 +16,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 namespace {
 	
 	_COM_SMARTPTR_TYPEDEF(IXMLDOMDocument2, __uuidof(IXMLDOMDocument2));
+	using Dictionary = std::map<std::wstring, DWORD>;
 	
 	std::shared_ptr<ItemFilter> g_IncludeSettings{ nullptr };
 	std::shared_ptr<ItemFilter> g_excludeSettings{ nullptr };
@@ -23,36 +24,36 @@ namespace {
 
 }
 
-std::map<std::wstring, DWORD> ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
-	std::map<std::wstring, DWORD> dictionary;
-	IXMLDOMNodeListPtr dictEntries;
+Dictionary ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
+	Dictionary dictionary;
+	IXMLDOMNodeListPtr entries;
 	xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
-	if (FAILED(xmlDoc->selectNodes(L"/Dictionary/*", &dictEntries))) {
-		return std::map<std::wstring, DWORD>{};
+	if (FAILED(xmlDoc->selectNodes(L"/Settings/Dictionary/*", &entries))) {
+		return Dictionary{};
 	}
 
-	LONG dictCount = 0;
-	if (FAILED(dictEntries->get_length(&dictCount))) {
-		return std::map<std::wstring, DWORD>{};
+	LONG count = 0;
+	if (FAILED(entries->get_length(&count))) {
+		return Dictionary{};
 	}
 
-	for (int i = 0; i < dictCount; i++) {
+	for (int i = 0; i < count; i++) {
 		IXMLDOMNodePtr node;
-		if (FAILED(dictEntries->nextNode(&node))) {
-			return std::map<std::wstring, DWORD>{};
+		if (FAILED(entries->nextNode(&node))) {
+			return Dictionary{};
 		}
 		_bstr_t name;
 		if (FAILED(node->get_nodeName(name.GetAddress()))) {
-			return std::map<std::wstring, DWORD>{};
+			return Dictionary{};
 		}
 		_bstr_t valueStr;
 		if (FAILED(node->get_text(valueStr.GetAddress()))) {
-			return std::map<std::wstring, DWORD>{};
+			return Dictionary{};
 		}
 		
 		DWORD value = strtoul(valueStr, nullptr, 16);
 		if (value == 0) {
-			return std::map<std::wstring, DWORD>{};
+			return Dictionary{};
 		}
 
 		dictionary[std::wstring(name)] = value;
@@ -63,37 +64,198 @@ std::map<std::wstring, DWORD> ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
 }
 
 void LoadSettings(const std::wstring& filePath) {
-	std::shared_ptr<ItemFilter> newIncludeSettings{ std::make_shared<ItemFilter>() };
-	std::shared_ptr<ItemFilter> newExcludeSettings{ std::make_shared<ItemFilter>() };
+	try {
+		std::shared_ptr<ItemFilter> newIncludeSettings;
+		std::shared_ptr<ItemFilter> newExcludeSettings;
 
-	{
-		ComHelper com;
+		{
+			ComHelper com;
 
-		
+			IXMLDOMDocument2Ptr xmlDoc;
+			HRESULT hr = xmlDoc.CreateInstance(__uuidof(DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
+			if (FAILED(hr)) {
+				//well shit
+				return;
+			}
 
-		IXMLDOMDocument2Ptr xmlDoc;
-		HRESULT hr = xmlDoc.CreateInstance(__uuidof(DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
-		if (FAILED(hr)) {
-			//well shit
-			return;
+			_variant_t variantPath{ filePath.c_str() };
+			VARIANT_BOOL success;
+			if (FAILED(xmlDoc->load(variantPath, &success)) || success == VARIANT_FALSE) {
+				//failed to load xml
+				return;
+			}
+
+			Dictionary dictionary{ ReadDictionary(xmlDoc) };
+
+			//quality includes
+			{
+				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+				IXMLDOMNodeListPtr entries;
+				if (FAILED(xmlDoc->selectNodes(L"/Settings/Quality/Include", &entries))) {
+					return;
+				}
+
+				LONG count = 0;
+				if (FAILED(entries->get_length(&count))) {
+					return;
+				}
+
+				for (int i = 0; i < count; i++) {
+					IXMLDOMNodePtr node;
+					if (FAILED(entries->nextNode(&node))) {
+						return;
+					}
+					_bstr_t valueStr;
+					if (FAILED(node->get_text(valueStr.GetAddress()))) {
+						return;
+					}
+
+					if (newIncludeSettings == nullptr) {
+						newIncludeSettings = std::make_shared<ItemFilter>();
+					}
+
+					Dictionary::const_iterator search = dictionary.find(std::wstring(valueStr));
+					if (search != dictionary.end()) {
+						newIncludeSettings->AddQuality(search->second);
+					}
+					else {
+						DWORD value = strtoul(valueStr, nullptr, 16);
+						if (value == 0) {
+							return;
+						}
+						newIncludeSettings->AddQuality(value);
+					}
+				}
+			}
+			//quality excludes
+			{
+				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+				IXMLDOMNodeListPtr entries;
+				if (FAILED(xmlDoc->selectNodes(L"/Settings/Quality/Exclude", &entries))) {
+					return;
+				}
+
+				LONG count = 0;
+				if (FAILED(entries->get_length(&count))) {
+					return;
+				}
+
+				for (int i = 0; i < count; i++) {
+					IXMLDOMNodePtr node;
+					if (FAILED(entries->nextNode(&node))) {
+						return;
+					}
+					_bstr_t valueStr;
+					if (FAILED(node->get_text(valueStr.GetAddress()))) {
+						return;
+					}
+
+					if (newExcludeSettings == nullptr) {
+						newExcludeSettings = std::make_shared<ItemFilter>();
+					}
+
+					Dictionary::const_iterator search = dictionary.find(std::wstring(valueStr));
+					if (search != dictionary.end()) {
+						newExcludeSettings->AddQuality(search->second);
+					}
+					else {
+						DWORD value = strtoul(valueStr, nullptr, 16);
+						if (value == 0) {
+							return;
+						}
+						newExcludeSettings->AddQuality(value);
+					}
+				}
+			}
+			//code includes
+			{
+				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+				IXMLDOMNodeListPtr entries;
+				if (FAILED(xmlDoc->selectNodes(L"/Settings/Item/Include", &entries))) {
+					return;
+				}
+
+				LONG count = 0;
+				if (FAILED(entries->get_length(&count))) {
+					return;
+				}
+
+				for (int i = 0; i < count; i++) {
+					IXMLDOMNodePtr node;
+					if (FAILED(entries->nextNode(&node))) {
+						return;
+					}
+					_bstr_t valueStr;
+					if (FAILED(node->get_text(valueStr.GetAddress()))) {
+						return;
+					}
+
+					if (newIncludeSettings == nullptr) {
+						newIncludeSettings = std::make_shared<ItemFilter>();
+					}
+
+					Dictionary::const_iterator search = dictionary.find(std::wstring(valueStr));
+					if (search != dictionary.end()) {
+						newIncludeSettings->AddCode(search->second);
+					}
+					else {
+						DWORD value = strtoul(valueStr, nullptr, 16);
+						if (value == 0) {
+							return;
+						}
+						newIncludeSettings->AddCode(value);
+					}
+				}
+			}
+			//code excludes
+			{
+				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+				IXMLDOMNodeListPtr entries;
+				if (FAILED(xmlDoc->selectNodes(L"/Settings/Item/Exclude", &entries))) {
+					return;
+				}
+
+				LONG count = 0;
+				if (FAILED(entries->get_length(&count))) {
+					return;
+				}
+
+				for (int i = 0; i < count; i++) {
+					IXMLDOMNodePtr node;
+					if (FAILED(entries->nextNode(&node))) {
+						return;
+					}
+					_bstr_t valueStr;
+					if (FAILED(node->get_text(valueStr.GetAddress()))) {
+						return;
+					}
+
+					if (newExcludeSettings == nullptr) {
+						newExcludeSettings = std::make_shared<ItemFilter>();
+					}
+
+					Dictionary::const_iterator search = dictionary.find(std::wstring(valueStr));
+					if (search != dictionary.end()) {
+						newExcludeSettings->AddCode(search->second);
+					}
+					else {
+						DWORD value = strtoul(valueStr, nullptr, 16);
+						if (value == 0) {
+							return;
+						}
+						newExcludeSettings->AddCode(value);
+					}
+				}
+			}
 		}
 
-		_variant_t variantPath{ filePath.c_str() };
-		VARIANT_BOOL success;
-		if (FAILED(xmlDoc->load(variantPath, &success)) || success == VARIANT_FALSE) {
-			//failed to load xml
-			return;
-		}
-		xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
-
-		std::map<std::wstring, DWORD> dictionary{ ReadDictionary(xmlDoc) };
-
-		
-
+		std::lock_guard<std::mutex>{ g_lock };
+		g_IncludeSettings = newIncludeSettings;
+		g_excludeSettings = newExcludeSettings;
 	}
-
-	std::lock_guard<std::mutex>{ g_lock };
-	g_excludeSettings = newIncludeSettings;
+	catch (...) {
+		//something went wrong, don't kill d2
+	}
 }
 
 BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem)
@@ -103,6 +265,13 @@ BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem)
 
 	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		return TRUE;
+
+	if (GetAsyncKeyState(VK_MENU) & 0x8000)
+	{
+		int i = 0;
+		i++;
+	}
+		
 
 	//UNIQUE & SET ITEMS
 	/*if (pItem->pItemData->dwQuality == 0x07 || pItem->pItemData->dwQuality == 0x05)
@@ -241,7 +410,7 @@ BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem)
 	//		return TRUE;
 	//	}
 	//
-	return FALSE;
+	return TRUE;
 }
 
 DWORD WINAPI Worker(LPVOID) {
@@ -250,8 +419,7 @@ DWORD WINAPI Worker(LPVOID) {
 	GetModuleFileNameW((HINSTANCE)&__ImageBase, dllFolder, _countof(dllFolder));
 	PathCchRemoveFileSpec(dllFolder, MAX_PATH);
 
-	std::wstring settingsFile = std::wstring(dllFolder) + L"settings.xml";
-
+	std::wstring settingsFile = std::wstring(dllFolder) + L"\\settings.xml";
 	LoadSettings(settingsFile);
 
 	FileWatcher fw{ dllFolder, L"settings.xml", [settingsFile]() { LoadSettings(settingsFile);} };
