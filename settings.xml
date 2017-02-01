@@ -1,0 +1,17 @@
+<Settings>
+    <Dictionary>
+        <foo>fa</foo><!-- random value -->
+        <bar>0x9</bar><!-- random value -->
+        <LargeAxe>20393131</LargeAxe>
+        <SomeTrophie>0x203130B5</SomeTrophie>
+        <Sets>0x05</Sets>
+    </Dictionary>
+    <Item>
+        <Include>foo</Include>
+        <Exclude>LargeAxe</Exclude>
+    </Item>
+    <Quality>
+        <Include>0x07</Include><!-- uniques -->
+        <Exclude>Sets</Exclude>
+    </Quality>
+</Settings>
