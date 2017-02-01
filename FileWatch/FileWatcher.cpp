@@ -2,27 +2,10 @@
 #include "FileWatcher.h"
 #include <Shlwapi.h>
 
-class FileWatcherImpl
-{
-public:
-	FileWatcherImpl(const std::wstring directory, const std::wstring filename, std::function<void(void)> callback);
-	~FileWatcherImpl();
-	void WatchFile();
-private:
-	std::wstring _directory;
-	std::wstring _filename;
-	HANDLE _directoryHandle = nullptr;
-	BYTE _buffer[10000];
-	OVERLAPPED _overlapped{};
-	DWORD _bytesReturned = 0;
-	bool _shouldPushUpdate = false;
-	std::function<void(void)> _callback{};
-
-	static void CALLBACK FileChanged(DWORD errorCode, DWORD numberOfBytesTransfered, LPOVERLAPPED overlapped);
-};
 
 
-FileWatcherImpl::FileWatcherImpl(const std::wstring directory, const std::wstring filename, std::function<void(void)> callback) : _directory(directory), _filename(filename), _callback(callback)
+
+FileWatcher::FileWatcher(const std::wstring& directory, const std::wstring& filename, std::function<void(void)> callback) : _directory(directory), _filename(filename), _callback(callback)
 {
 	if (_directoryHandle == nullptr)
 	{
@@ -46,12 +29,12 @@ FileWatcherImpl::FileWatcherImpl(const std::wstring directory, const std::wstrin
 	_overlapped.hEvent = this;
 }
 
-FileWatcherImpl::~FileWatcherImpl()
+FileWatcher::~FileWatcher()
 {
 	CloseHandle(_directoryHandle);
 }
 
-void FileWatcherImpl::WatchFile()
+void FileWatcher::WatchFile()
 {
 	ReadDirectoryChangesW(_directoryHandle, &_buffer, sizeof(_buffer), FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE, &_bytesReturned, &_overlapped, &FileChanged);
 	//make sure events are finished, events can be noisy depending on the size of the change.
@@ -64,9 +47,9 @@ void FileWatcherImpl::WatchFile()
 	}
 }
 
-void CALLBACK FileWatcherImpl::FileChanged(DWORD errorCode, DWORD numberOfBytesTransfered, LPOVERLAPPED overlapped)
+void CALLBACK FileWatcher::FileChanged(DWORD errorCode, DWORD numberOfBytesTransfered, LPOVERLAPPED overlapped)
 {
-	FileWatcherImpl* watcher = static_cast<FileWatcherImpl*>(overlapped->hEvent);
+	FileWatcher* watcher = static_cast<FileWatcher*>(overlapped->hEvent);
 	for (FILE_NOTIFY_INFORMATION *info = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&watcher->_buffer), *previous = 0; info != previous; previous = info, info += info->NextEntryOffset)
 	{
 		if (info->Action != FILE_ACTION_MODIFIED)
@@ -77,19 +60,4 @@ void CALLBACK FileWatcherImpl::FileChanged(DWORD errorCode, DWORD numberOfBytesT
 		}
 	}
 
-}
-
-FileWatcher::FileWatcher(const std::wstring directory, const std::wstring filename, std::function<void(void)> callback)
-{
-	_pimpl = new FileWatcherImpl(directory, filename, callback);
-}
-
-FileWatcher::~FileWatcher()
-{
-	delete _pimpl;
-}
-
-void FileWatcher::WatchFile()
-{
-	_pimpl->WatchFile();
 }

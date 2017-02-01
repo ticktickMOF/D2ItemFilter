@@ -32,3 +32,11 @@
 *.app
 *.db
 *.opendb
+*.log
+*.tlog
+*.pdb
+*.idb
+*.ipch
+*.ilk
+*.cache
+*.suo
