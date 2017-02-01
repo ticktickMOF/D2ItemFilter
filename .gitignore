@@ -40,3 +40,5 @@
 *.ilk
 *.cache
 *.suo
+*.tlh
+*.tli

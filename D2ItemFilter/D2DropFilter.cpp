@@ -7,14 +7,59 @@
 #include <PathCch.h>
 #include "ItemFilter.h"
 #include "ComHelper.h"
+#include <MsXml6.h>
+#include <comdef.h>
+#include <map>
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 namespace {
+	
+	_COM_SMARTPTR_TYPEDEF(IXMLDOMDocument2, __uuidof(IXMLDOMDocument2));
+	
 	std::shared_ptr<ItemFilter> g_IncludeSettings{ nullptr };
 	std::shared_ptr<ItemFilter> g_excludeSettings{ nullptr };
 	std::mutex g_lock;
 
+}
+
+std::map<std::wstring, DWORD> ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
+	std::map<std::wstring, DWORD> dictionary;
+	IXMLDOMNodeListPtr dictEntries;
+	xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+	if (FAILED(xmlDoc->selectNodes(L"/Dictionary/*", &dictEntries))) {
+		return std::map<std::wstring, DWORD>{};
+	}
+
+	LONG dictCount = 0;
+	if (FAILED(dictEntries->get_length(&dictCount))) {
+		return std::map<std::wstring, DWORD>{};
+	}
+
+	for (int i = 0; i < dictCount; i++) {
+		IXMLDOMNodePtr node;
+		if (FAILED(dictEntries->nextNode(&node))) {
+			return std::map<std::wstring, DWORD>{};
+		}
+		_bstr_t name;
+		if (FAILED(node->get_nodeName(name.GetAddress()))) {
+			return std::map<std::wstring, DWORD>{};
+		}
+		_bstr_t valueStr;
+		if (FAILED(node->get_text(valueStr.GetAddress()))) {
+			return std::map<std::wstring, DWORD>{};
+		}
+		
+		DWORD value = strtoul(valueStr, nullptr, 16);
+		if (value == 0) {
+			return std::map<std::wstring, DWORD>{};
+		}
+
+		dictionary[std::wstring(name)] = value;
+		
+	}
+
+	return dictionary;
 }
 
 void LoadSettings(const std::wstring& filePath) {
@@ -23,12 +68,28 @@ void LoadSettings(const std::wstring& filePath) {
 
 	{
 		ComHelper com;
-		std::ifstream file{ filePath };
 
-		int itemCode;
-		while (file >> itemCode) {
-			newIncludeSettings->AddCode(itemCode);
+		
+
+		IXMLDOMDocument2Ptr xmlDoc;
+		HRESULT hr = xmlDoc.CreateInstance(__uuidof(DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
+		if (FAILED(hr)) {
+			//well shit
+			return;
 		}
+
+		_variant_t variantPath{ filePath.c_str() };
+		VARIANT_BOOL success;
+		if (FAILED(xmlDoc->load(variantPath, &success)) || success == VARIANT_FALSE) {
+			//failed to load xml
+			return;
+		}
+		xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+
+		std::map<std::wstring, DWORD> dictionary{ ReadDictionary(xmlDoc) };
+
+		
+
 	}
 
 	std::lock_guard<std::mutex>{ g_lock };
@@ -73,7 +134,7 @@ BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem)
 		return TRUE;
 	}
 
-	
+
 	//	//WIRTS LEG & CUBE
 	//	if (dwCode == CODE32('leg ') || dwCode == CODE32('box '))
 	//	{
@@ -189,11 +250,11 @@ DWORD WINAPI Worker(LPVOID) {
 	GetModuleFileNameW((HINSTANCE)&__ImageBase, dllFolder, _countof(dllFolder));
 	PathCchRemoveFileSpec(dllFolder, MAX_PATH);
 
-	std::wstring settingsFile = std::wstring(dllFolder) + L"settings.txt";
+	std::wstring settingsFile = std::wstring(dllFolder) + L"settings.xml";
 
 	LoadSettings(settingsFile);
 
-	FileWatcher fw{ dllFolder, L"settings.txt", [settingsFile]() { LoadSettings(settingsFile);} };
+	FileWatcher fw{ dllFolder, L"settings.xml", [settingsFile]() { LoadSettings(settingsFile);} };
 	while (true) {
 		fw.WatchFile();
 		SleepEx(INFINITE, true);
