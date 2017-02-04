@@ -14,12 +14,13 @@
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 namespace {
-	
+
 	_COM_SMARTPTR_TYPEDEF(IXMLDOMDocument2, __uuidof(IXMLDOMDocument2));
 	using Dictionary = std::map<std::wstring, DWORD>;
-	
+
 	std::shared_ptr<ItemFilter> g_IncludeSettings{ nullptr };
 	std::shared_ptr<ItemFilter> g_excludeSettings{ nullptr };
+	bool g_exlucdeThenInclude = false;
 	std::mutex g_lock;
 
 }
@@ -50,14 +51,14 @@ Dictionary ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
 		if (FAILED(node->get_text(valueStr.GetAddress()))) {
 			return Dictionary{};
 		}
-		
+
 		DWORD value = strtoul(valueStr, nullptr, 16);
 		if (value == 0) {
 			return Dictionary{};
 		}
 
 		dictionary[std::wstring(name)] = value;
-		
+
 	}
 
 	return dictionary;
@@ -247,6 +248,27 @@ void LoadSettings(const std::wstring& filePath) {
 					}
 				}
 			}
+
+			//exclude then include
+			{
+				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
+				IXMLDOMNodeListPtr entries;
+				if (FAILED(xmlDoc->selectNodes(L"/Settings/ExcludeThenInclude", &entries))) {
+					return;
+				}
+
+				LONG count = 0;
+				if (FAILED(entries->get_length(&count))) {
+					return;
+				}
+
+				if (count > 0) {
+					g_exlucdeThenInclude = true;
+				}
+				else {
+					g_exlucdeThenInclude = false;
+				}
+			}
 		}
 
 		std::lock_guard<std::mutex>{ g_lock };
@@ -266,17 +288,11 @@ BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem)
 	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 		return TRUE;
 
-	if (GetAsyncKeyState(VK_MENU) & 0x8000)
-	{
-		int i = 0;
-		i++;
-	}
-		
 
 	//UNIQUE & SET ITEMS
 	/*if (pItem->pItemData->dwQuality == 0x07 || pItem->pItemData->dwQuality == 0x05)
-		return TRUE;
-*/
+	   return TRUE;
+ */
 	D2ItemsTXT* pItemTxt = D2COMMON_GetItemTxtRecord(pItem->dwClass);
 	if (pItemTxt == NULL) { return FALSE; }
 
@@ -285,10 +301,18 @@ BOOL __fastcall DROPFILTER_Main(D2UnitStrc* pItem)
 
 	std::lock_guard<std::mutex> {g_lock};
 	if (g_IncludeSettings != nullptr && g_excludeSettings != nullptr) {
-		if (g_IncludeSettings->IsIncluded(quality, code) && !g_excludeSettings->IsIncluded(quality, code)) {
+		if (g_exlucdeThenInclude) {
+			if (g_excludeSettings->IsIncluded(quality, code) && !g_IncludeSettings->IsIncluded(quality, code)) {
+				return FALSE;
+			}
 			return TRUE;
 		}
-		return FALSE;
+		else {
+			if (g_IncludeSettings->IsIncluded(quality, code) && !g_excludeSettings->IsIncluded(quality, code)) {
+				return TRUE;
+			}
+			return FALSE;
+		}
 	}
 	else if (g_IncludeSettings != nullptr && g_excludeSettings == nullptr) {
 		if (g_IncludeSettings->IsIncluded(quality, code)) {
