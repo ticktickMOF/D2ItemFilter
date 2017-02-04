@@ -1,3 +1,4 @@
+#pragma once
 /************************************************
 *	D2Ptrs.h									*
 *												*
@@ -61,6 +62,8 @@ D2FUNC(D2CLIENT, GetItemName, BOOL, __stdcall, (D2UnitStrc*, wchar_t*, size_t), 
 D2PTR(D2CLIENT, D2CLIENT_6FB09419, 0x59419)		//return bad
 D2PTR(D2CLIENT, D2CLIENT_6FB09087, 0x59087)		//return good
 
+D2FUNC(D2CLIENT, PrintGameString, void, __stdcall, (const wchar_t *wMessage, int nColor), 0x7D850)
+
 ///////////////////
 // D2COMMON.DLL ///
 ///////////////////
@@ -72,3 +75,4 @@ D2FUNC(D2COMMON, GetItemTxtRecord, D2ItemsTXT*, __stdcall, (DWORD), 0x719A0)
 /////////////////
 
 D2FUNC(D2LANG, GetStringFromIndex, const wchar_t*, __fastcall, (WORD), 0x9450)
+

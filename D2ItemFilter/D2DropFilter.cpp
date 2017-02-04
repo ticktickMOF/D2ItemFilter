@@ -4,12 +4,14 @@
 #include <memory>
 #include <mutex>
 #include <fstream>
-#include <PathCch.h>
+#include <Shlwapi.h>
 #include "ItemFilter.h"
 #include "ComHelper.h"
 #include <MsXml6.h>
 #include <comdef.h>
 #include <map>
+#include "D2Ptrs.h"
+#include <exception>
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
@@ -30,31 +32,31 @@ Dictionary ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
 	IXMLDOMNodeListPtr entries;
 	xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
 	if (FAILED(xmlDoc->selectNodes(L"/Settings/Dictionary/*", &entries))) {
-		return Dictionary{};
+		throw new std::runtime_error("Unknown error.");
 	}
 
 	LONG count = 0;
 	if (FAILED(entries->get_length(&count))) {
-		return Dictionary{};
+		throw new std::runtime_error("Unknown error.");
 	}
 
 	for (int i = 0; i < count; i++) {
 		IXMLDOMNodePtr node;
 		if (FAILED(entries->nextNode(&node))) {
-			return Dictionary{};
+			throw new std::runtime_error("Unknown error.");
 		}
 		_bstr_t name;
 		if (FAILED(node->get_nodeName(name.GetAddress()))) {
-			return Dictionary{};
+			throw new std::runtime_error("Unknown error.");
 		}
 		_bstr_t valueStr;
 		if (FAILED(node->get_text(valueStr.GetAddress()))) {
-			return Dictionary{};
+			throw new std::runtime_error("Unknown error.");
 		}
 
 		DWORD value = strtoul(valueStr, nullptr, 16);
 		if (value == 0) {
-			return Dictionary{};
+			throw new std::runtime_error("Parse Error: value is not hex.");
 		}
 
 		dictionary[std::wstring(name)] = value;
@@ -65,6 +67,7 @@ Dictionary ReadDictionary(IXMLDOMDocument2Ptr xmlDoc) {
 }
 
 void LoadSettings(const std::wstring& filePath) {
+	D2CLIENT_PrintGameString(std::wstring(L"D2ItemFilter: Trying to load: " + filePath).c_str(), 2);
 	try {
 		std::shared_ptr<ItemFilter> newIncludeSettings;
 		std::shared_ptr<ItemFilter> newExcludeSettings;
@@ -76,14 +79,14 @@ void LoadSettings(const std::wstring& filePath) {
 			HRESULT hr = xmlDoc.CreateInstance(__uuidof(DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
 			if (FAILED(hr)) {
 				//well shit
-				return;
+				throw std::runtime_error("Failed to create MSXML6 document object.  Is MSXML6 installed?");
 			}
 
 			_variant_t variantPath{ filePath.c_str() };
 			VARIANT_BOOL success;
 			if (FAILED(xmlDoc->load(variantPath, &success)) || success == VARIANT_FALSE) {
 				//failed to load xml
-				return;
+				throw std::runtime_error("Failed to load xml document.");
 			}
 
 			Dictionary dictionary{ ReadDictionary(xmlDoc) };
@@ -93,22 +96,22 @@ void LoadSettings(const std::wstring& filePath) {
 				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
 				IXMLDOMNodeListPtr entries;
 				if (FAILED(xmlDoc->selectNodes(L"/Settings/Quality/Include", &entries))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				LONG count = 0;
 				if (FAILED(entries->get_length(&count))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				for (int i = 0; i < count; i++) {
 					IXMLDOMNodePtr node;
 					if (FAILED(entries->nextNode(&node))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 					_bstr_t valueStr;
 					if (FAILED(node->get_text(valueStr.GetAddress()))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 
 					if (newIncludeSettings == nullptr) {
@@ -122,7 +125,7 @@ void LoadSettings(const std::wstring& filePath) {
 					else {
 						DWORD value = strtoul(valueStr, nullptr, 16);
 						if (value == 0) {
-							return;
+							throw std::runtime_error("Parse error: value is not hex.");
 						}
 						newIncludeSettings->AddQuality(value);
 					}
@@ -133,22 +136,22 @@ void LoadSettings(const std::wstring& filePath) {
 				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
 				IXMLDOMNodeListPtr entries;
 				if (FAILED(xmlDoc->selectNodes(L"/Settings/Quality/Exclude", &entries))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				LONG count = 0;
 				if (FAILED(entries->get_length(&count))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				for (int i = 0; i < count; i++) {
 					IXMLDOMNodePtr node;
 					if (FAILED(entries->nextNode(&node))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 					_bstr_t valueStr;
 					if (FAILED(node->get_text(valueStr.GetAddress()))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 
 					if (newExcludeSettings == nullptr) {
@@ -162,7 +165,7 @@ void LoadSettings(const std::wstring& filePath) {
 					else {
 						DWORD value = strtoul(valueStr, nullptr, 16);
 						if (value == 0) {
-							return;
+							throw std::runtime_error("Parse Error: value is not hex.");
 						}
 						newExcludeSettings->AddQuality(value);
 					}
@@ -173,22 +176,22 @@ void LoadSettings(const std::wstring& filePath) {
 				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
 				IXMLDOMNodeListPtr entries;
 				if (FAILED(xmlDoc->selectNodes(L"/Settings/Item/Include", &entries))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				LONG count = 0;
 				if (FAILED(entries->get_length(&count))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				for (int i = 0; i < count; i++) {
 					IXMLDOMNodePtr node;
 					if (FAILED(entries->nextNode(&node))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 					_bstr_t valueStr;
 					if (FAILED(node->get_text(valueStr.GetAddress()))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 
 					if (newIncludeSettings == nullptr) {
@@ -202,7 +205,7 @@ void LoadSettings(const std::wstring& filePath) {
 					else {
 						DWORD value = strtoul(valueStr, nullptr, 16);
 						if (value == 0) {
-							return;
+							throw std::runtime_error("Parse Error: value is not hex.");
 						}
 						newIncludeSettings->AddCode(value);
 					}
@@ -213,22 +216,22 @@ void LoadSettings(const std::wstring& filePath) {
 				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
 				IXMLDOMNodeListPtr entries;
 				if (FAILED(xmlDoc->selectNodes(L"/Settings/Item/Exclude", &entries))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				LONG count = 0;
 				if (FAILED(entries->get_length(&count))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				for (int i = 0; i < count; i++) {
 					IXMLDOMNodePtr node;
 					if (FAILED(entries->nextNode(&node))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 					_bstr_t valueStr;
 					if (FAILED(node->get_text(valueStr.GetAddress()))) {
-						return;
+						throw std::runtime_error("Unknown error.");
 					}
 
 					if (newExcludeSettings == nullptr) {
@@ -242,7 +245,7 @@ void LoadSettings(const std::wstring& filePath) {
 					else {
 						DWORD value = strtoul(valueStr, nullptr, 16);
 						if (value == 0) {
-							return;
+							throw new std::runtime_error("Parse Error: value is not hex.");
 						}
 						newExcludeSettings->AddCode(value);
 					}
@@ -254,12 +257,12 @@ void LoadSettings(const std::wstring& filePath) {
 				xmlDoc->setProperty(L"SelectionLanguage", _variant_t(L"XPath"));
 				IXMLDOMNodeListPtr entries;
 				if (FAILED(xmlDoc->selectNodes(L"/Settings/ExcludeThenInclude", &entries))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				LONG count = 0;
 				if (FAILED(entries->get_length(&count))) {
-					return;
+					throw std::runtime_error("Unknown error.");
 				}
 
 				if (count > 0) {
@@ -274,9 +277,19 @@ void LoadSettings(const std::wstring& filePath) {
 		std::lock_guard<std::mutex>{ g_lock };
 		g_IncludeSettings = newIncludeSettings;
 		g_excludeSettings = newExcludeSettings;
+		D2CLIENT_PrintGameString(L"D2ItemFilter: successfully loaded settings!", 2);
+	}
+	catch (std::runtime_error e) {
+		std::string msg{ e.what() };
+		std::wstring buf( msg.length(), (wchar_t)0 );
+
+		size_t charsConverted = 0;
+		mbstowcs_s(&charsConverted, &buf[0], buf.capacity(), msg.c_str(), msg.length());
+		D2CLIENT_PrintGameString(std::wstring(L"D2ItemFilter: settings load  failure: " + buf).c_str(), 2);
 	}
 	catch (...) {
 		//something went wrong, don't kill d2
+		D2CLIENT_PrintGameString(L"D2ItemFilter: settings load  failure: something unknown went wrong.", 2);
 	}
 }
 
@@ -441,7 +454,7 @@ DWORD WINAPI Worker(LPVOID) {
 
 	wchar_t dllFolder[MAX_PATH];
 	GetModuleFileNameW((HINSTANCE)&__ImageBase, dllFolder, _countof(dllFolder));
-	PathCchRemoveFileSpec(dllFolder, MAX_PATH);
+	PathRemoveFileSpecW(dllFolder);
 
 	std::wstring settingsFile = std::wstring(dllFolder) + L"\\settings.xml";
 	LoadSettings(settingsFile);
