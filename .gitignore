@@ -44,3 +44,10 @@
 *.tli
 *.iobj
 *.ipdb
+/ConsoleApplication1/bin
+/ConsoleApplication1/obj
+/FilterConfigurator/bin
+/FilterConfigurator/obj
+/Debug
+/test.xml
+/ConsoleApplication1

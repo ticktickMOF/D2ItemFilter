@@ -31,7 +31,30 @@ struct D2UnitStrc;
 
 struct D2ItemDataStrc
 {
-	DWORD dwQuality;
+	enum itemQualities : DWORD {
+		QUALITY_LOW = 1,
+		QUALITY_NORMAL = 2,
+		QUALITY_SUPERIOR = 3,
+		QUALITY_MAGIC = 4,
+		QUALITY_SET = 5,
+		QUALITY_RARE = 6,
+		QUALITY_UNIQUE = 7,
+		QUALITY_CRAFTED = 8,
+		QUALITY_TAMPERED = 9
+	} dwQuality;
+	struct D2ItemSeed {
+		DWORD lowSeed;
+		DWORD highSeed;
+	} itemSeed;
+	DWORD ownerGUID;
+	DWORD fingerprint;
+	DWORD commandFlags;
+	enum itemFlags : DWORD {
+		FLAGS_SOCKETED = 0x00000800,
+		FLAGS_ETHERAL = 0x00400000,
+		FLAGS_RUNEWORD = 0x04000000
+	} itemFlags;
+	// more omitted
 };
 
 struct D2UnitStrc

@@ -3,6 +3,11 @@
 #include <set>
 #include <intsafe.h>
 
+struct ItemCriteria {
+	DWORD quality;
+	DWORD code;
+};
+
 class ItemFilter
 {
 public:
