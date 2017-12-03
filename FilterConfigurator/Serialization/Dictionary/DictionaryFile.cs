@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace FilterConfigurator.Serialization
+namespace DotNetD2ItemFilter.Serialization.Dictionary
 {
     [Serializable]
     [XmlRoot(ElementName ="ItemDictionary")]
-    public class DictionaryFile
+    public class File
     {
-        public Quality[] Qualities { get; set; }
+        //public Quality[] Qualities { get; set; }
+
         [XmlElement(ElementName ="Group")]
         public ItemGroup[] ItemGroups { get; set; }
     }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace FilterConfigurator.Serialization
+namespace DotNetD2ItemFilter.Serialization.Dictionary
 {
     [Serializable]
     [System.Diagnostics.DebuggerDisplay("{" + nameof(Name) + "} Filterable:{" + nameof(QualityFilterable) + "} {Content.Length}")]

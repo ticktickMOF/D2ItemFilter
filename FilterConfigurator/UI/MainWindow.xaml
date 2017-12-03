@@ -1,0 +1,428 @@
+﻿<Window x:Class="DotNetD2ItemFilter.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DotNetD2ItemFilter.UI"
+        xmlns:d2if="clr-namespace:DotNetD2ItemFilter"
+        xmlns:gc="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="900">
+    <Window.Resources>
+        <local:DesignTimeViewModel x:Key="DesignTimeData"/>
+    </Window.Resources>
+    <Grid d:DataContext="{StaticResource DesignTimeData}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0">
+            <TabItem Header="Filters" DataContext="{Binding FilterItemGroups}">
+                <TabControl ItemsSource="{Binding}">
+                    <TabControl.Resources>
+                        <DataTemplate DataType="{x:Type local:ItemGroupWithQualities}">
+                            <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" CanUserResizeRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Name" SortMemberPath="Name">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition></ColumnDefinition>
+                                                        <ColumnDefinition></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}" Margin="5,0"></TextBlock>
+                                                    <CheckBox Grid.Column="1" IsChecked="{Binding AllQualities.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding AllQualities.IsTriState, Mode=OneWay}" HorizontalAlignment="Right"></CheckBox>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="LowQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding LowQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding LowQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Low</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding LowQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="NormalQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding NormalQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding NormalQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Normal</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding NormalQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="SuperiorQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding SuperiorQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding SuperiorQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Superior</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding SuperiorQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="MagicQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding MagicQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding MagicQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Magic</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding MagicQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="RareQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding RareQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding RareQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Rare</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding RareQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="SetQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding SetQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding SetQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Set</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding SetQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="UniqueQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding UniqueQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding UniqueQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Unique</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding UniqueQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="CraftedQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding CraftedQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding CraftedQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Crafted</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding CraftedQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="HonorificQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding HonorificQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding HonorificQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Honorific</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding HonorificQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type local:ItemGroupWithoutQualities}">
+                            <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" CanUserResizeRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Name}" Header="Name" SortMemberPath="Name"></DataGridTextColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="LowQuality.">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding AllItemsEnabled.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding AllItemsEnabled.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding Selected.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DataTemplate>
+                    </TabControl.Resources>
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                </TabControl>
+            </TabItem>
+            <TabItem Header="Notifications" DataContext="{Binding NotifyItemGroups}">
+                <TabControl ItemsSource="{Binding}">
+                    <TabControl.Resources>
+                        <DataTemplate DataType="{x:Type local:ItemGroupWithQualities}">
+                            <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" CanUserResizeRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Name" SortMemberPath="Name">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition></ColumnDefinition>
+                                                        <ColumnDefinition></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}" Margin="5,0"></TextBlock>
+                                                    <CheckBox Grid.Column="1" IsChecked="{Binding AllQualities.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding AllQualities.IsTriState, Mode=OneWay}" HorizontalAlignment="Right"></CheckBox>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="LowQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding LowQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding LowQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Low</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding LowQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="NormalQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding NormalQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding NormalQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Normal</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding NormalQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="SuperiorQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding SuperiorQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding SuperiorQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Superior</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding SuperiorQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="MagicQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding MagicQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding MagicQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Magic</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding MagicQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="RareQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding RareQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding RareQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Rare</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding RareQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="SetQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding SetQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding SetQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Set</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding SetQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="UniqueQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding UniqueQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding UniqueQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Unique</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding UniqueQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="CraftedQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding CraftedQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding CraftedQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Crafted</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding CraftedQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="HonorificQuality.Value">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding HonorificQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding HonorificQuality.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                                <TextBlock Margin="5,0,0,0">Honorific</TextBlock>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding HonorificQuality.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type local:ItemGroupWithoutQualities}">
+                            <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" CanUserResizeRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Name}" Header="Name" SortMemberPath="Name"></DataGridTextColumn>
+
+                                    <DataGridTemplateColumn SortMemberPath="LowQuality.">
+                                        <DataGridTemplateColumn.Header>
+                                            <StackPanel Orientation="Horizontal" Margin="5,0">
+                                                <CheckBox DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}" IsChecked="{Binding AllItemsEnabled.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="{Binding AllItemsEnabled.IsTriState, Mode=OneWay}" HorizontalAlignment="Center"></CheckBox>
+                                            </StackPanel>
+                                        </DataGridTemplateColumn.Header>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <CheckBox IsChecked="{Binding Selected.Value, UpdateSourceTrigger=PropertyChanged}" IsThreeState="False" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DataTemplate>
+                    </TabControl.Resources>
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                </TabControl>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Click="SaveChanges" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" Padding="5,2">Save</Button>
+        </Grid>
+    </Grid>
+</Window>

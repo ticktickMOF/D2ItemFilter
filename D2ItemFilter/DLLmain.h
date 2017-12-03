@@ -14,37 +14,46 @@
 
 enum D2DLLS
 {
-	D2DLL_D2CLIENT,
-	D2DLL_D2CMP,
-	D2DLL_D2COMMON,
-	D2DLL_D2GAME,
-	D2DLL_D2GFX,
-	D2DLL_D2LANG,
-	D2DLL_D2LAUNCH,
-	D2DLL_D2NET,
-	D2DLL_D2SOUND,
-	D2DLL_D2WIN,
-	D2DLL_FOG,
-	D2DLL_STORM,
-	D2DLL_BNCLIENT,
-	D2DLL_INVALID,
+    D2DLL_D2CLIENT,
+    D2DLL_D2CMP,
+    D2DLL_D2COMMON,
+    D2DLL_D2GAME,
+    D2DLL_D2GFX,
+    D2DLL_D2LANG,
+    D2DLL_D2LAUNCH,
+    D2DLL_D2NET,
+    D2DLL_D2SOUND,
+    D2DLL_D2WIN,
+    D2DLL_FOG,
+    D2DLL_STORM,
+    D2DLL_BNCLIENT,
+    D2DLL_MXL,
+    D2DLL_INVALID,
 };
 
 struct DllFile
 {
-	char* szName;
-	void* hModule;
-	int nRelocated;
-	DWORD nAddress;
-	DWORD nKnownAddress;
+    char* szName;
+    void* hModule;
+    int nRelocated;
+    DWORD nAddress;
+    DWORD nKnownAddress;
 };
 
 struct CodePatch
 {
-	int nDllFile;
-	DWORD nAdddress;
-	DWORD nData;
-	int nFixMe;
+    int nDllFile;
+    DWORD nAdddress;
+    DWORD nData;
+    int nFixMe;
+};
+
+struct SmallCodePatch
+{
+    int nDllFile;
+    DWORD nAdddress;
+    BYTE nData;
+    int nFixMe;
 };
 
 #define DLLBASE_BNCLIENT		(DWORD)LoadLibraryA("Bnclient.dll")
@@ -71,19 +80,22 @@ struct CodePatch
 #define DLLBASE_SMACKW32		(DWORD)LoadLibraryA("SmackW32.dll")
 #define DLLBASE_PLUGY			(DWORD)LoadLibraryA("PlugY.dll")
 #define DLLBASE_GLIDE3X			(DWORD)LoadLibraryA("glide3x.dll")
+#define DLLBASE_MXL			(DWORD)LoadLibraryA("MXL.dll")
 
 static DllFile gDllFiles[] =
 {
-	{"D2CLIENT.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("D2Client.dll")},
-	{"D2CMP.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2CMP.dll")},
-	{"D2COMMON.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("D2Common.dll")},
-	{"D2GAME.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Game.dll")},
-	{"D2GFX.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Gfx.dll")},
-	{"D2LANG.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Lang.dll")},
-	{"D2LAUNCH.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("D2Launch.dll")},
-	{"D2NET.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Net.dll")},
-	{"D2SOUND.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Sound.dll")},
-	{"D2WIN.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Win.dll")},
-	{"FOG.DLL",			0,	0,	0,	(DWORD)LoadLibraryA("Fog.dll")},
-	{"STORM.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("Storm.dll")},
+    {"D2CLIENT.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("D2Client.dll")},
+    {"D2CMP.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2CMP.dll")},
+    {"D2COMMON.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("D2Common.dll")},
+    {"D2GAME.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Game.dll")},
+    {"D2GFX.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Gfx.dll")},
+    {"D2LANG.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Lang.dll")},
+    {"D2LAUNCH.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("D2Launch.dll")},
+    {"D2NET.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Net.dll")},
+    {"D2SOUND.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Sound.dll")},
+    {"D2WIN.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("D2Win.dll")},
+    {"FOG.DLL",			0,	0,	0,	(DWORD)LoadLibraryA("Fog.dll")},
+    {"STORM.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("Storm.dll")},
+    { "BNCLIENT.DLL",	0,	0,	0,	(DWORD)LoadLibraryA("Bnclient.dll") },
+    { "MXL.DLL",		0,	0,	0,	(DWORD)LoadLibraryA("MXL.dll") },
 };

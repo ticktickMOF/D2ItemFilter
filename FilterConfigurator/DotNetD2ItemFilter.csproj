@@ -7,13 +7,14 @@
     <ProjectGuid>{411292BB-1934-4B59-9305-C6AF2A1B1F21}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FilterConfigurator</RootNamespace>
-    <AssemblyName>FilterConfigurator</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>DotNetD2ItemFilter</RootNamespace>
+    <AssemblyName>DotNetD2ItemFilter</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,6 +38,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -51,24 +55,41 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <ApplicationDefinition Include="UI\App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Serialization\DictionaryFile.cs" />
-    <Compile Include="Serialization\FilterItems.cs" />
-    <Compile Include="Serialization\Item.cs" />
-    <Compile Include="Serialization\ItemGroup.cs" />
-    <Compile Include="Serialization\Quality.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="D2Client.cs" />
+    <Compile Include="D2Common.cs" />
+    <Compile Include="D2Lang.cs" />
+    <Compile Include="D2Register.cs" />
+    <Compile Include="D2Structs.cs" />
+    <Compile Include="DictionaryGenerator.cs" />
+    <Compile Include="DropNotifier.cs" />
+    <Compile Include="FilterReloader.cs" />
+    <Compile Include="Globals.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="NonExportedLayer.cs" />
+    <Compile Include="Serialization\Dictionary\DictionaryFile.cs" />
+    <Compile Include="Serialization\Filter\FilterItems.cs" />
+    <Compile Include="Serialization\Dictionary\Item.cs" />
+    <Compile Include="Serialization\Dictionary\ItemGroup.cs" />
+    <Compile Include="UI\BoolNotifyCollectionEtAl.cs" />
+    <Compile Include="UI\ViewModel.cs" />
+    <Compile Include="UsableFilter.cs" />
+    <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
+    <Compile Include="UI\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="UI\ItemGroupWithoutQualities.cs" />
+    <Compile Include="UI\ItemGroupWithQualities.cs" />
+    <Compile Include="UI\ItemWithoutQualities.cs" />
+    <Compile Include="UI\ItemWithQualities.cs" />
+    <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -101,7 +122,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ItemDictionary.xml" />
+    <None Include="ItemDictionary.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

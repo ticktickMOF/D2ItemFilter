@@ -1,8 +1,8 @@
-﻿<Application x:Class="FilterConfigurator.App"
+﻿<Application x:Class="DotNetD2ItemFilter.UI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FilterConfigurator"
-             StartupUri="MainWindow.xaml">
+             xmlns:local="clr-namespace:DotNetD2ItemFilter.UI"
+             StartupUri="UI/MainWindow.xaml">
     <Application.Resources>
          
     </Application.Resources>

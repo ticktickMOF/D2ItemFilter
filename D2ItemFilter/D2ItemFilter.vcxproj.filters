@@ -48,10 +48,10 @@
     <ClInclude Include="TemplateIncludes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ItemFilter.h">
+    <ClInclude Include="ComHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComHelper.h">
+    <ClInclude Include="CLRHost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,11 +65,14 @@
     <ClCompile Include="DLLmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ItemFilter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ComHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CLRHost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Windows\Microsoft.NET\Framework\v4.0.30319\mscorlib.tlb" />
   </ItemGroup>
 </Project>

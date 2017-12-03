@@ -41,8 +41,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>DropFilter</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>DropFilter</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -68,6 +72,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CLRHost.h" />
     <ClInclude Include="ComHelper.h" />
     <ClInclude Include="D2Constants.h" />
     <ClInclude Include="D2DataTables.h" />
@@ -79,20 +84,21 @@
     <ClInclude Include="D2Structs.h" />
     <ClInclude Include="D2Vars.h" />
     <ClInclude Include="DLLmain.h" />
-    <ClInclude Include="ItemFilter.h" />
     <ClInclude Include="TemplateIncludes.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CLRHost.cpp" />
     <ClCompile Include="ComHelper.cpp" />
     <ClCompile Include="D2DropFilter.cpp" />
     <ClCompile Include="D2PatchStubs.cpp" />
     <ClCompile Include="DLLmain.cpp" />
-    <ClCompile Include="ItemFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FileWatch\FileWatch.vcxproj">
-      <Project>{b942d1c4-442a-4926-8ba9-873f18203a03}</Project>
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+    <None Include="C:\Windows\Microsoft.NET\Framework\v4.0.30319\mscorlib.tlb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FilterConfigurator\DotNetD2ItemFilter.csproj">
+      <Project>{411292bb-1934-4b59-9305-c6af2a1b1f21}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

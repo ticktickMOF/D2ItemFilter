@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace FilterConfigurator.Serialization
+namespace DotNetD2ItemFilter.Serialization.Dictionary
 {
     [System.Diagnostics.DebuggerDisplay("{"+ nameof(Name) + "} {" + nameof(Code) + "} {" + nameof(IntCode) + "}")]
     public class Item

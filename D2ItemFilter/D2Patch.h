@@ -15,3 +15,11 @@ static const CodePatch gCodePatches[] =
 
 	{D2DLL_INVALID},	//Must be the last entry in the array!
 };
+
+static const SmallCodePatch gSmallCodePatches[] =
+{
+    //{ D2DLL_MXL,	DLLBASE_MXL + 0x14df,	(BYTE)0xEB,	0 },//disable crash when debugger is attached
+    //{ D2DLL_MXL, DLLBASE_MXL + 0xab50 , (BYTE) 0, 0},//disable debugger message spam
+
+    { D2DLL_INVALID },	//Must be the last entry in the array!
+};
